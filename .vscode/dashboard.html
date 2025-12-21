@@ -1,72 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>GST Client Management</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
+  <div class="layout">
 
-<div class="layout">
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <h3>Client Panel</h3>
-    <button onclick="showSection('gst')">GST Clients</button>
-    <button onclick="showSection('it')">Income Tax Clients</button>
-    <button onclick="showSection('local')">Local Clients</button>
-  </div>
-
-  <!-- CONTENT -->
-  <div class="content">
-
-    <!-- GST SECTION -->
-    <div id="gstSection">
-      <h2>GST Clients</h2>
-      <button onclick="openGSTModal()">➕ Add GST Client</button>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Client</th>
-            <th>Month</th>
-            <th>GSTR-1</th>
-            <th>GSTR-3B</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="gstTable"></tbody>
-      </table>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <h3 style="text-align: center;">Client Panel</h3>
+      <button onclick="showSection('gst')">GST Clients</button>
+      <button onclick="showSection('it')">Income Tax Clients</button>
+      <button onclick="showSection('local')">Local Clients</button>
     </div>
 
-    <!-- IT SECTION -->
-    <div id="itSection" style="display:none">
-      <h2>Income Tax Clients</h2>
-      <p>Future module</p>
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- GST SECTION -->
+      <div id="gstSection">
+        <h2 style="color: #1f3c88; text-align: center;">GST Clients (Rolen and associates)</h2>
+        <button class="btn-primary" onclick="openGSTModal()">+ Add Client</button>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Month</th>
+              <th>GSTR-1</th>
+              <th>GSTR-3B</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="gstTable"></tbody>
+        </table>
+      </div>
+
+      <!-- IT SECTION -->
+      <div id="itSection" style="display:none">
+
+        <h2 style="text-align: center; color: #1f3c88;">Income Tax Clients</h2>
+        <div class="page-header">
+          <button class="btn-primary" id="openITModal">+ Add Client</button>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Client Name</th>
+                <th>PAN</th>
+                <th>Assessment Year</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="itTableBody">
+              <tr class="empty-row">
+                <td colspan="5">No Income Tax Clients added yet</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LOCAL -->
+      <div id="localSection" style="display:none">
+        <h2>Local Clients</h2>
+        <p>Future module</p>
+      </div>
+
     </div>
+  </div>
 
-    <!-- LOCAL SECTION -->
-    <div id="localSection" style="display:none">
-      <h2>Local Clients</h2>
-      <p>Future module</p>
+  <!-- GST MODAL -->
+  <div class="modal" id="gstModal">
+    <div class="modal-content">
+      <h3>Add GST Client</h3>
+      <input type="text" id="gstName" placeholder="Client Name">
+      <input type="text" id="gstNo" placeholder="GST Number">
+      <div class="btn-group">
+        <button class="btn-save" id="saveGSTBtn">Save</button>
+        <button class="btn-close" onclick="closeGSTModal()">Close</button>
+      </div>
     </div>
-
   </div>
-</div>
 
-<!-- ADD GST MODAL -->
-<div class="modal" id="gstModal">
-  <div class="modal-box">
-    <h3>Add GST Client</h3>
-
-    <input type="text" id="gstName" placeholder="Client Name">
-    <input type="text" id="gstNo" placeholder="GST Number">
-
-    <button id="saveGSTBtn">Save</button>
-    <button onclick="closeGSTModal()">Close</button>
+  <!-- IT MODAL -->
+  <div class="modal" id="itModal">
+    <div class="modal-content">
+      <h3>Add Income Tax Client</h3>
+      <input type="text" id="itClientName" placeholder="Client Name">
+      <input type="text" id="itClientPAN" placeholder="PAN Number">
+      <input type="text" id="itAssessmentYear" placeholder="Assessment Year (2024-25)">
+      <div class="btn-group">
+        <button class="btn-save" id="saveITClient">Save</button>
+        <button class="btn-close" id="closeITModal">Close</button>
+      </div>
+    </div>
   </div>
-</div>
 
-<script src="js/script.js"></script>
+  <script src="js/script.js"></script>
 </body>
+
 </html>

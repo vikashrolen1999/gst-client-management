@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GST Client Management</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Client Panel</h3>
+    <button onclick="showSection('gst')">GST Clients</button>
+    <button onclick="showSection('it')">Income Tax Clients</button>
+    <button onclick="showSection('local')">Local Clients</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- GST SECTION -->
+    <div id="gstSection">
+      <h2>GST Clients</h2>
+      <button onclick="openGSTModal()">➕ Add GST Client</button>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Month</th>
+            <th>GSTR-1</th>
+            <th>GSTR-3B</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="gstTable"></tbody>
+      </table>
+    </div>
+
+    <!-- IT SECTION -->
+    <div id="itSection" style="display:none">
+      <h2>Income Tax Clients</h2>
+      <p>Future module</p>
+    </div>
+
+    <!-- LOCAL SECTION -->
+    <div id="localSection" style="display:none">
+      <h2>Local Clients</h2>
+      <p>Future module</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD GST MODAL -->
+<div class="modal" id="gstModal">
+  <div class="modal-box">
+    <h3>Add GST Client</h3>
+
+    <input type="text" id="gstName" placeholder="Client Name">
+    <input type="text" id="gstNo" placeholder="GST Number">
+
+    <button id="saveGSTBtn">Save</button>
+    <button onclick="closeGSTModal()">Close</button>
+  </div>
+</div>
+
+<script src="js/script.js"></script>
+</body>
+</html>

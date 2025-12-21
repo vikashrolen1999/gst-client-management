@@ -1,19 +1,29 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Login | GST Client Management</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<div class="container">
-  <h2>Login</h2>
-  <input type="email" id="loginEmail" placeholder="Email">
-  <input type="password" id="loginPassword" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p>New user? <a href="register.html">Register here</a></p>
-</div>
+  <div class="container">
+    <h2>Login</h2>
 
-<script src="js/script.js"></script>
+    <div>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+    </div>
+
+    <div class="btn-groupLogin">
+      <button onclick="login()" class="Loginbutton">Login</button>
+    </div>
+
+    <p>New user? <a href="register.html">Register here</a></p>
+  </div>
+
+  <script src="js/script.js"></script>
 </body>
+
 </html>

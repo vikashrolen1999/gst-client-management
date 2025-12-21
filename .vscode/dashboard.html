@@ -6,6 +6,45 @@
   <title>GST Client Management</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h2>GST Client Management</h2>
+  </div>
+
+  <div class="topbar-right">
+    <span class="username">Mukesh Mehra</span>
+
+    <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile" id="profileIcon"
+      style="width:30px; height:30px; border-radius:50%; cursor:pointer;">
+
+    <!-- 👇 YAHAN ADD KARNA HAI -->
+    <div id="profileDropdown" style="
+      position:absolute;
+      right:20px;
+      top:60px;
+      background:#fff;
+      border:1px solid #ccc;
+      border-radius:5px;
+      display:none;
+      z-index:1000;
+    ">
+      <button onclick="logout()" style="
+        background:none;
+        border:none;
+        padding:10px 20px;
+        cursor:pointer;
+        width:100%;
+        text-align:left;
+        color: black;
+      ">
+        Logout
+      </button>
+    </div>
+
+  </div>
+</header>
+
 
 <body>
   <div class="layout">
@@ -31,11 +70,13 @@
             <tr>
               <th>SN No.</th>
               <th>Client Name</th>
-              <th>Client Contact NO.</th>
+              <th>Client Mo. NO.</th>
               <th>Number of Firm</th>
               <th>GSTIN</th>
-              <th>GST Portal ID</th>
-              <th>GST Portal Password</th>
+              <th>GST ID</th>
+              <th>GST Pass</th>
+              <th>Other ID</th>
+              <th>Other Pass</th>
               <th>Month</th>
               <th>GSTR-1</th>
               <th>GSTR-3B</th>
@@ -89,12 +130,53 @@
     <div class="modal-content">
       <h3>Add / Edit GST Client</h3>
 
-      <input type="text" id="gstName" placeholder="Client Name">
-      <input type="text" id="gstContact" placeholder="Client Contact No">
-      <input type="number" id="gstFirmCount" placeholder="Number of Firm">
-      <input type="text" id="gstIn" placeholder="GSTIN">
-      <input type="text" id="gstPortalId" placeholder="GST Portal ID">
-      <input type="password" id="gstPortalPass" placeholder="GST Portal Password">
+      <label for="gstName">Client Name</label>
+      <input type="text" id="gstName" placeholder="Enter Client Name">
+
+      <label for="gstContact">Client Contact No.</label>
+      <input type="text" id="gstContact" placeholder="Enter Contact No">
+
+      <label for="gstFirmCount">Number of Firm</label>
+      <input type="number" id="gstFirmCount" placeholder="Enter Number of Firms">
+
+      <label for="gstIn">GSTIN</label>
+      <input type="text" id="gstIn" placeholder="Enter GSTIN">
+
+      <label for="gstPortalId">GST Portal ID</label>
+      <input type="text" id="gstPortalId" placeholder="Enter Portal ID">
+
+      <label for="gstPortalPass">GST Portal Password</label>
+      <div style="position: relative;">
+        <input type="password" id="gstPortalPass" placeholder="Enter Portal Password">
+
+        <span id="togglePass" style="
+      position:absolute;
+      right:10px;
+      top:50%;
+      transform:translateY(-50%);
+      cursor:pointer;
+      font-size:16px;
+      user-select:none;
+    ">👁️</span>
+      </div>
+
+      <label for="otherId">Other ID</label>
+      <input type="text" id="otherId" placeholder="Enter Other ID">
+
+      <label for="otherPass">Other Password</label>
+      <div style="position: relative;">
+        <input type="password" id="otherPass" placeholder="Enter Other Password">
+        <span id="toggleOtherPass" style="
+      position:absolute;
+      right:10px;
+      top:50%;
+      transform:translateY(-50%);
+      cursor:pointer;
+      font-size:16px;
+    ">👁️</span>
+      </div>
+
+      <label for="gstMonth">Month</label>
       <select id="gstMonth">
         <option value="">Select Month</option>
         <option>January</option>
@@ -110,9 +192,11 @@
         <option>November</option>
         <option>December</option>
       </select>
-      <input type="number" id="gstFees" placeholder="Fees">
 
-      <div class="btn-group">
+      <label for="gstFees">Fees</label>
+      <input type="number" id="gstFees" placeholder="Enter Fees">
+
+      <div class="btn-group" style="margin-top: 10px;">
         <button class="btn-save" id="saveGSTBtn">Save</button>
         <button class="btn-close" onclick="closeGSTModal()">Close</button>
       </div>
@@ -135,5 +219,6 @@
 
   <script src="js/script.js"></script>
 </body>
+
 
 </html>

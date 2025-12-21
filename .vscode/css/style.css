@@ -28,7 +28,7 @@ select {
 button {
   padding: 10px;
   width: 95%;
-  background: #2c7be5;
+  background: #1f3c88;
   color: white;
   border: none;
   cursor: pointer;
@@ -53,7 +53,7 @@ body {
 
 .sidebar {
   width: 200px;
-  background: #2c7be5;
+  background: #1f3c88;
   color: white;
   height: 100vh;
   padding: 15px;
@@ -91,7 +91,7 @@ td {
 
 button {
   padding: 6px 10px;
-  background: #2c7be5;
+  background: #1f3c88;
   color: white;
   border: none;
   cursor: pointer;
@@ -132,7 +132,7 @@ body {
 
 .sidebar {
   width: 200px;
-  background: #2c7be5;
+  background: #1f3c88;
   color: white;
   padding: 15px;
 }
@@ -141,7 +141,7 @@ body {
   width: 100%;
   margin: 8px 0;
   padding: 8px;
-  background: #0556c2;
+  background: #1f3c88;
   border: none;
   cursor: pointer;
 }
@@ -235,7 +235,7 @@ td {
 }
 
 .btn-primary {
-  background: #2f7be5;
+  background: #1f3c88;
   color: #fff;
   padding: 10px 16px;
   border: none;
@@ -245,7 +245,7 @@ td {
 }
 
 .btn-primary:hover {
-  background: #1f5fcc;
+  background: #1f3c88;
 }
 
 /* Cards */
@@ -266,7 +266,7 @@ td {
 
 .card h3 {
   font-size: 28px;
-  color: #2f7be5;
+  color: #1f3c88;
 }
 
 .card p {
@@ -321,6 +321,8 @@ td {
   width: 400px;
   padding: 20px;
   border-radius: 8px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .modal-content h3 {
@@ -351,4 +353,133 @@ select {
 .action-icon {
   cursor: pointer;
   font-size: 18px;
+}
+
+.btn-groupHide {
+  display: flex;
+  justify-content: space-between;
+  /* left right */
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-groupHide button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* TOP BAR */
+.topbar {
+  height: 60px;
+  background-color: #1f3c88;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.topbar-left h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.username {
+  font-size: 14px;
+}
+
+.profile-icon img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+.btn-groupLogin {
+  margin-top: 15px;
+}
+
+.Loginbutton {
+  padding: 6px 10px;
+  background: #1f3c88;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.container {
+  width: 350px;
+  margin: 100px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* INPUT STYLE – screenshot jaisa */
+.container input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* Focus effect */
+.container input:focus {
+  border-color: #1f3c88;
+}
+
+/* LOGIN BUTTON */
+.Loginbutton {
+  width: 100%;
+  padding: 12px;
+  background-color: #1f3c88;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.Loginbutton:hover {
+  background-color: #162e66;
+}
+
+.btn-groupLogin {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.container p {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+}
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
 }

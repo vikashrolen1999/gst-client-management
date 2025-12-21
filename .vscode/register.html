@@ -1,20 +1,41 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Register | GST Client Management</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<div class="container">
-  <h2>Register</h2>
-  <input type="text" id="name" placeholder="Full Name">
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="register()" class="Loginbutton">Register</button>
-  <p>Already registered? <a href="index.html">Login</a></p>
-</div>
+  <div class="container">
+    <h2>Register</h2>
 
-<script src="js/script.js"></script>
+    <div id="message" class="message"></div>
+
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="email" id="email" placeholder="Email">
+
+    <!-- Password with eye icon -->
+    <div style="position: relative;">
+      <input type="password" id="password" placeholder="Password" style="width:100%; padding-right:40px;">
+      <span id="registerEye" onclick="toggleRegisterPassword()" style="
+        position:absolute;
+        right:10px;
+        top:50%;
+        transform:translateY(-50%);
+        cursor:pointer;
+        user-select:none;
+      ">👁️</span>
+    </div>
+
+    <button onclick="register()" class="Loginbutton">Register</button>
+
+    <p>Already registered? <a href="index.html">Login</a></p>
+  </div>
+
+
+  <script src="js/script.js"></script>
 </body>
+
 </html>

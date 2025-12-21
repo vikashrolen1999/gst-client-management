@@ -29,17 +29,14 @@ function showSection(type) {
   localSection.style.display = type === "local" ? "block" : "none";
 }
 
-/* ================= GST CLIENTS ================= */
-
+/******** GST CLIENTS ********/
 let gstClients = JSON.parse(localStorage.getItem("gstClients")) || [];
 let editIndex = null;
 
-/******** MODAL ********/
 function openGSTModal(index = null) {
   gstModal.style.display = "flex";
   editIndex = index;
-
-  restrictPastMonths(); // 🔥 added
+  restrictPastMonths();
 
   if (index !== null) {
     const c = gstClients[index];
@@ -63,7 +60,6 @@ function closeGSTModal() {
     .forEach((el) => (el.value = ""));
 }
 
-/******** SAVE ********/
 saveGSTBtn.onclick = () => {
   const client = {
     name: gstName.value.trim(),
@@ -86,18 +82,15 @@ saveGSTBtn.onclick = () => {
     alert("Client Name cannot exceed 20 characters");
     return;
   }
-  if (editIndex !== null) {
-    gstClients[editIndex] = client;
-  } else {
-    gstClients.push(client);
-  }
+
+  if (editIndex !== null) gstClients[editIndex] = client;
+  else gstClients.push(client);
 
   localStorage.setItem("gstClients", JSON.stringify(gstClients));
   renderGST();
   closeGSTModal();
 };
 
-/******** RENDER ********/
 function renderGST() {
   gstTable.innerHTML = "";
 
@@ -114,34 +107,28 @@ function renderGST() {
         <td>${c.otherId || ""}</td>
         <td>${c.otherPass || ""}</td>
         <td>${c.month}</td>
- 
-
-        <!-- GSTR-1 -->
-      <td>
-  <select data-type="gstr1" onchange="updateStatus(event, ${i})">
-    <option value="Pending" ${
-      c.gstr1 === "Pending" ? "selected" : ""
-    }>Pending</option>
-    <option value="Filed" ${
-      c.gstr1 === "Filed" ? "selected" : ""
-    }>Filed</option>
-  </select>
-  &nbsp;<span onclick="sendWhatsApp('${c.contact}', 'gstr1')">💬</span>
-</td>
-
-<td>
-  <select data-type="gstr3b" onchange="updateStatus(event, ${i})">
-    <option value="Pending" ${
-      c.gstr3b === "Pending" ? "selected" : ""
-    }>Pending</option>
-    <option value="Filed" ${
-      c.gstr3b === "Filed" ? "selected" : ""
-    }>Filed</option>
-  </select>
-  &nbsp;<span onclick="sendWhatsApp('${c.contact}', 'gstr3b')">💬</span>
-</td>
-
-
+        <td>
+          <select data-type="gstr1" onchange="updateStatus(event, ${i})">
+            <option value="Pending" ${
+              c.gstr1 === "Pending" ? "selected" : ""
+            }>Pending</option>
+            <option value="Filed" ${
+              c.gstr1 === "Filed" ? "selected" : ""
+            }>Filed</option>
+          </select>
+          &nbsp;<span onclick="sendWhatsApp('${c.contact}', 'gstr1')">💬</span>
+        </td>
+        <td>
+          <select data-type="gstr3b" onchange="updateStatus(event, ${i})">
+            <option value="Pending" ${
+              c.gstr3b === "Pending" ? "selected" : ""
+            }>Pending</option>
+            <option value="Filed" ${
+              c.gstr3b === "Filed" ? "selected" : ""
+            }>Filed</option>
+          </select>
+          &nbsp;<span onclick="sendWhatsApp('${c.contact}', 'gstr3b')">💬</span>
+        </td>
         <td>₹${c.fees}</td>
         <td style="display: flex; padding-top: 2rem;">
           <span onclick="openGSTModal(${i})">✏️</span>
@@ -153,7 +140,6 @@ function renderGST() {
   });
 }
 
-/******** DELETE ********/
 function deleteGST(index) {
   if (!confirm("Delete this GST client?")) return;
   gstClients.splice(index, 1);
@@ -161,248 +147,190 @@ function deleteGST(index) {
   renderGST();
 }
 
-/******** INIT ********/
 renderGST();
 
-/* ================= INCOME TAX CLIENTS ================= */
-
-let itClients = JSON.parse(localStorage.getItem("itClients")) || [];
-
-openITModal.onclick = () => {
-  itModal.style.display = "flex";
-};
-
-closeITModal.onclick = () => {
-  itModal.style.display = "none";
-};
-
-saveITClient.onclick = () => {
-  const name = itClientName.value.trim();
-  const pan = itClientPAN.value.trim();
-  const ay = itAssessmentYear.value.trim();
-
-  if (!name || !pan || !ay) {
-    alert("All fields required");
-    return;
-  }
-
-  itClients.push({
-    name,
-    pan,
-    ay,
-    status: "Pending",
-  });
-
-  localStorage.setItem("itClients", JSON.stringify(itClients));
-  renderIT();
-
-  itModal.style.display = "none";
-  itClientName.value = itClientPAN.value = itAssessmentYear.value = "";
-};
-
-function renderIT() {
-  itTableBody.innerHTML = "";
-
-  if (itClients.length === 0) {
-    itTableBody.innerHTML = `
-      <tr class="empty-row">
-        <td colspan="5">No Income Tax Clients added yet</td>
-      </tr>`;
-    return;
-  }
-
-  itClients.forEach((c, i) => {
-    itTableBody.innerHTML += `
-      <tr>
-        <td>${c.name}</td>
-        <td>${c.pan}</td>
-        <td>${c.ay}</td>
-        <td>${c.status}</td>
-        <td>
-          <button onclick="deleteIT(${i})">Delete</button>
-        </td>
-      </tr>
-    `;
-  });
-}
-
-function deleteIT(i) {
-  itClients.splice(i, 1);
-  localStorage.setItem("itClients", JSON.stringify(itClients));
-  renderIT();
-}
-
-renderIT();
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-function updateStatus(e, index) {
-  const type = e.target.dataset.type;
-  const value = e.target.value;
-
-  gstClients[index][type] = value;
-  const client = gstClients[index];
-
-  if (client.gstr1 === "Filed" && client.gstr3b === "Filed") {
-    const currentMonthIndex = months.indexOf(client.month?.trim());
-    if (currentMonthIndex === -1) return;
-
-    const nextMonthIndex = currentMonthIndex === 11 ? 0 : currentMonthIndex + 1;
-
-    const nextMonth = months[nextMonthIndex];
-
-    const exists = gstClients.some(
-      (c) =>
-        c.gstin === client.gstin &&
-        c.name === client.name &&
-        c.month === nextMonth
-    );
-
-    if (!exists) {
-      gstClients.push({
-        name: client.name,
-        contact: client.contact,
-        firms: client.firms || "",
-        gstin: client.gstin,
-        portalId: client.portalId,
-        portalPass: client.portalPass,
-        month: nextMonth,
-        gstr1: "Pending",
-        gstr3b: "Pending",
-        fees: client.fees,
-      });
-    }
-  }
-
-  localStorage.setItem("gstClients", JSON.stringify(gstClients));
-  renderGST();
-}
-
-function restrictPastMonths() {
-  const currentMonthIndex = new Date().getMonth();
-
-  [...gstMonth.options].forEach((opt, index) => {
-    if (index === 0) return; // Select Month
-    opt.disabled = index - 1 < currentMonthIndex;
-  });
-}
-
-function sendWhatsApp(contact, type) {
-  if (!contact) {
-    alert("Client contact number not available");
-    return;
-  }
-
-  const mobile = contact.replace(/\D/g, "");
-
-  let message = "";
-
-  if (type === "gstr1") {
-    message =
-      "Dear Sir,\nApki GST R1 file ho chuki hai.\nThank you.\nRolen & Associates";
-  } else if (type === "gstr3b") {
-    message =
-      "Dear Sir,\nApki GST GSTR-3B file ho chuki hai.\nThank you.\nRolen & Associates";
-  } else {
-    message = "Hello";
-  }
-
-  const url = `https://wa.me/91${mobile}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank");
-}
-
-const togglePass = document.getElementById("togglePass");
-togglePass.onclick = () => {
-  if (gstPortalPass.type === "password") {
-    gstPortalPass.type = "text";
-    togglePass.textContent = "🙈";
-  } else {
-    gstPortalPass.type = "password";
-    togglePass.textContent = "👁️";
-  }
-};
-
+/******** LOGIN / REGISTER / PROFILE ********/
 const profileIcon = document.getElementById("profileIcon");
 const profileDropdown = document.getElementById("profileDropdown");
+const editProfileModal = document.getElementById("editProfileModal");
+const editName = document.getElementById("editName");
+const editImage = document.getElementById("editImage");
+const previewImage = document.getElementById("previewImage");
+const topbarName = document.getElementById("topbarName");
 
-profileIcon.onclick = (e) => {
+let loggedInEmail = localStorage.getItem("loggedInEmail");
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let currentUser = users.find((u) => u.email === loggedInEmail);
+
+if (currentUser) {
+  topbarName.textContent = currentUser.name;
+  if (currentUser.image) profileIcon.src = currentUser.image;
+}
+
+// Profile dropdown toggle
+profileIcon.addEventListener("click", (e) => {
   e.stopPropagation();
   profileDropdown.style.display =
     profileDropdown.style.display === "block" ? "none" : "block";
-};
+});
 
-document.onclick = () => {
+// Close dropdown if clicked outside
+document.addEventListener("click", () => {
   profileDropdown.style.display = "none";
-};
+});
 
+// Open edit profile modal
+function openEditProfile() {
+  if (!currentUser) return alert("No user logged in");
+  editName.value = currentUser.name || "";
+  previewImage.src = currentUser.image || profileIcon.src;
+  editProfileModal.style.display = "flex";
+}
+
+function closeEditProfile() {
+  editProfileModal.style.display = "none";
+}
+
+editImage.addEventListener("change", function () {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      previewImage.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+function saveProfile() {
+  const newName = editName.value.trim();
+  const newImage = previewImage.src;
+  if (!newName) return alert("Name cannot be empty");
+
+  currentUser.name = newName;
+  currentUser.image = newImage;
+
+  users = users.map((u) => (u.email === currentUser.email ? currentUser : u));
+  localStorage.setItem("users", JSON.stringify(users));
+
+  topbarName.textContent = currentUser.name;
+  profileIcon.src = currentUser.image;
+
+  closeEditProfile();
+  alert("Profile updated successfully");
+}
+
+// Logout
 function logout() {
-  alert("Logout successful");
-  localStorage.clear();
-
-  // index.html par redirect
+  localStorage.removeItem("loggedInEmail");
   window.location.href = "index.html";
 }
-profileIcon.style.width = "30px";
-profileIcon.style.height = "30px";
-profileIcon.style.borderRadius = "50%";
 
+/******** PASSWORD TOGGLE FUNCTIONS ********/
+function toggleRegisterPassword() {
+  const passInput = document.getElementById("password");
+  const eyeIcon = document.getElementById("registerEye");
+  if (passInput.type === "password") {
+    passInput.type = "text";
+    eyeIcon.textContent = "🙈";
+  } else {
+    passInput.type = "password";
+    eyeIcon.textContent = "👁️";
+  }
+}
+
+function toggleLoginPassword() {
+  const passInput = document.getElementById("loginPassword");
+  const eyeIcon = document.getElementById("loginEye");
+  if (passInput.type === "password") {
+    passInput.type = "text";
+    eyeIcon.textContent = "🙈";
+  } else {
+    passInput.type = "password";
+    eyeIcon.textContent = "👁️";
+  }
+}
+
+/******** REGISTER FUNCTION ********/
 function register() {
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
+  const messageDiv = document.getElementById("message");
+  messageDiv.textContent = "";
+  messageDiv.classList.remove("success");
 
-  // Validation
-  if (!name || !email || !password) {
-    alert("All fields are required");
+  if (!name) {
+    messageDiv.textContent = "Name is required";
+    return;
+  }
+  if (!email) {
+    messageDiv.textContent = "Email is required";
+    return;
+  }
+  if (!password) {
+    messageDiv.textContent = "Password is required";
     return;
   }
 
-  // Get existing users
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    messageDiv.textContent =
+      "Password must be at least 8 characters, include uppercase, lowercase, number, and special character";
+    return;
+  }
+
   let users = JSON.parse(localStorage.getItem("users")) || [];
-
-  // Check if email already exists
-  const userExists = users.find((user) => user.email === email);
-  if (userExists) {
-    alert("User already registered with this email");
+  if (users.find((u) => u.email === email)) {
+    messageDiv.textContent = "User already registered with this email";
     return;
   }
 
-  // Save new user
-  users.push({
-    name: name,
-    email: email,
-    password: password,
-  });
-
+  users.push({ name, email, password });
   localStorage.setItem("users", JSON.stringify(users));
 
-  alert("Registration successful");
+  messageDiv.textContent = "Registration successful!";
+  messageDiv.classList.add("success");
 
-  // Redirect to login page
-  window.location.href = "index.html";
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 2000);
 }
 
-const otherPassInput = document.getElementById("otherPass");
-const toggleOtherPass = document.getElementById("toggleOtherPass");
+/******** LOGIN FUNCTION ********/
+function login() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+  const messageDiv = document.getElementById("loginMessage");
+  messageDiv.textContent = "";
+  messageDiv.classList.remove("success");
 
-toggleOtherPass.onclick = () => {
-  if (otherPassInput.type === "password") {
-    otherPassInput.type = "text";
-    toggleOtherPass.textContent = "🙈";
-  } else {
-    otherPassInput.type = "password";
-    toggleOtherPass.textContent = "👁️";
+  if (!email) {
+    messageDiv.textContent = "Email is required";
+    return;
   }
-};
+  if (!password) {
+    messageDiv.textContent = "Password is required";
+    return;
+  }
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    messageDiv.textContent =
+      "Password must be at least 8 characters, include uppercase, lowercase, number, and special character";
+    return;
+  }
+
+  const users = JSON.parse(localStorage.getItem("users")) || [];
+  const user = users.find((u) => u.email === email && u.password === password);
+  if (user) {
+    localStorage.setItem("loggedInEmail", user.email);
+    messageDiv.textContent = `Welcome, ${user.name}!`;
+    messageDiv.classList.add("success");
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 2000);
+  } else {
+    messageDiv.textContent = "Invalid email or password";
+  }
+}

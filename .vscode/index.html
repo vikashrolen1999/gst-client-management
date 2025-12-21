@@ -11,9 +11,22 @@
   <div class="container">
     <h2>Login</h2>
 
-    <div>
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Password">
+    <div id="loginMessage" class="message"></div>
+
+    <input type="email" id="loginEmail" placeholder="Email">
+
+    <div style="position: relative;">
+      <input type="password" id="loginPassword" placeholder="Password" style="width:100%; padding-right:40px;">
+
+      <span onclick="toggleLoginPassword()" id="loginEye" style="
+        position:absolute;
+        right:10px;
+        top:50%;
+        transform:translateY(-50%);
+        cursor:pointer;
+        font-size:16px;
+        user-select:none;
+      ">👁️</span>
     </div>
 
     <div class="btn-groupLogin">

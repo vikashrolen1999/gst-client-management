@@ -19,6 +19,12 @@ input {
   margin: 8px 0;
 }
 
+select {
+  width: 90%;
+  padding: 8px;
+  margin: 8px 0;
+}
+
 button {
   padding: 10px;
   width: 95%;
@@ -328,4 +334,21 @@ td {
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+}
+
+.modal-content select {
+  width: 100%;
+  padding: 9px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+select {
+  padding: 5px;
+}
+
+.action-icon {
+  cursor: pointer;
+  font-size: 18px;
 }

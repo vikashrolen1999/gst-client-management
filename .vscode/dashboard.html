@@ -29,10 +29,17 @@
         <table>
           <thead>
             <tr>
-              <th>Client</th>
+              <th>SN No.</th>
+              <th>Client Name</th>
+              <th>Client Contact NO.</th>
+              <th>Number of Firm</th>
+              <th>GSTIN</th>
+              <th>GST Portal ID</th>
+              <th>GST Portal Password</th>
               <th>Month</th>
               <th>GSTR-1</th>
               <th>GSTR-3B</th>
+              <th>Fees</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -80,9 +87,31 @@
   <!-- GST MODAL -->
   <div class="modal" id="gstModal">
     <div class="modal-content">
-      <h3>Add GST Client</h3>
+      <h3>Add / Edit GST Client</h3>
+
       <input type="text" id="gstName" placeholder="Client Name">
-      <input type="text" id="gstNo" placeholder="GST Number">
+      <input type="text" id="gstContact" placeholder="Client Contact No">
+      <input type="number" id="gstFirmCount" placeholder="Number of Firm">
+      <input type="text" id="gstIn" placeholder="GSTIN">
+      <input type="text" id="gstPortalId" placeholder="GST Portal ID">
+      <input type="password" id="gstPortalPass" placeholder="GST Portal Password">
+      <select id="gstMonth">
+        <option value="">Select Month</option>
+        <option>January</option>
+        <option>February</option>
+        <option>March</option>
+        <option>April</option>
+        <option>May</option>
+        <option>June</option>
+        <option>July</option>
+        <option>August</option>
+        <option>September</option>
+        <option>October</option>
+        <option>November</option>
+        <option>December</option>
+      </select>
+      <input type="number" id="gstFees" placeholder="Fees">
+
       <div class="btn-group">
         <button class="btn-save" id="saveGSTBtn">Save</button>
         <button class="btn-close" onclick="closeGSTModal()">Close</button>

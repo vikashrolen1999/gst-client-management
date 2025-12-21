@@ -4,6 +4,24 @@ if (window.__APP_LOADED__) {
 }
 window.__APP_LOADED__ = true;
 
+/******** GLOBAL ELEMENTS ********/
+const gstSection = document.getElementById("gstSection");
+const itSection = document.getElementById("itSection");
+const localSection = document.getElementById("localSection");
+
+const gstModal = document.getElementById("gstModal");
+const gstTable = document.getElementById("gstTable");
+
+const gstName = document.getElementById("gstName");
+const gstContact = document.getElementById("gstContact");
+const gstFirmCount = document.getElementById("gstFirmCount");
+const gstIn = document.getElementById("gstIn");
+const gstPortalId = document.getElementById("gstPortalId");
+const gstPortalPass = document.getElementById("gstPortalPass");
+const gstMonth = document.getElementById("gstMonth");
+const gstFees = document.getElementById("gstFees");
+const saveGSTBtn = document.getElementById("saveGSTBtn");
+
 /******** SECTION SWITCH ********/
 function showSection(type) {
   gstSection.style.display = type === "gst" ? "block" : "none";
@@ -14,62 +32,101 @@ function showSection(type) {
 /* ================= GST CLIENTS ================= */
 
 let gstClients = JSON.parse(localStorage.getItem("gstClients")) || [];
+let editIndex = null;
 
-function openGSTModal() {
+/******** MODAL ********/
+function openGSTModal(index = null) {
   gstModal.style.display = "flex";
+  editIndex = index;
+
+  if (index !== null) {
+    const c = gstClients[index];
+    gstName.value = c.name;
+    gstContact.value = c.contact;
+    gstFirmCount.value = c.firms;
+    gstIn.value = c.gstin;
+    gstPortalId.value = c.portalId;
+    gstPortalPass.value = c.portalPass;
+    gstMonth.value = c.month;
+    gstFees.value = c.fees;
+  }
 }
+
 function closeGSTModal() {
   gstModal.style.display = "none";
+  editIndex = null;
+  document.querySelectorAll("#gstModal input, #gstModal select")
+    .forEach(el => el.value = "");
 }
 
+/******** SAVE ********/
 saveGSTBtn.onclick = () => {
-  const name = gstName.value.trim();
-  const gst = gstNo.value.trim();
+  const client = {
+    name: gstName.value.trim(),
+    contact: gstContact.value.trim(),
+    firms: gstFirmCount.value.trim(),
+    gstin: gstIn.value.trim(),
+    portalId: gstPortalId.value.trim(),
+    portalPass: gstPortalPass.value.trim(),
+    month: gstMonth.value,
+    gstr1: "Pending",
+    gstr3b: "Pending",
+    fees: gstFees.value.trim()
+  };
 
-  if (!name || !gst) {
-    alert("Client Name & GST Number required");
+  if (!client.name || !client.gstin || !client.month) {
+    alert("Client Name, GSTIN & Month required");
     return;
   }
 
-  gstClients.push({
-    name,
-    gst,
-    months: {
-      Jan: { gstr1: "Pending", gstr3b: "Pending" }
-    }
-  });
+  if (editIndex !== null) {
+    gstClients[editIndex] = client;
+  } else {
+    gstClients.push(client);
+  }
 
   localStorage.setItem("gstClients", JSON.stringify(gstClients));
   renderGST();
   closeGSTModal();
-
-  gstName.value = gstNo.value = "";
 };
 
+/******** RENDER ********/
 function renderGST() {
   gstTable.innerHTML = "";
 
   gstClients.forEach((c, i) => {
     gstTable.innerHTML += `
       <tr>
+        <td>${i + 1}</td>
         <td>${c.name}</td>
-        <td>Jan</td>
-        <td>${c.months.Jan.gstr1}</td>
-        <td>${c.months.Jan.gstr3b}</td>
+        <td>${c.contact}</td>
+        <td>${c.firms}</td>
+        <td>${c.gstin}</td>
+        <td>${c.portalId}</td>
+        <td>******</td>
+        <td>${c.month}</td>
+        <td>${c.gstr1}</td>
+        <td>${c.gstr3b}</td>
+        <td>₹${c.fees}</td>
         <td>
-          <button onclick="deleteGST(${i})">Delete</button>
+          <span onclick="openGSTModal(${i})" style="cursor:pointer">✏️</span>
+          &nbsp;
+          <span onclick="deleteGST(${i})" style="cursor:pointer">🗑️</span>
         </td>
       </tr>
     `;
   });
 }
 
-function deleteGST(i) {
-  gstClients.splice(i, 1);
+/******** DELETE ********/
+function deleteGST(index) {
+  if (!confirm("Delete this GST client?")) return;
+  gstClients.splice(index, 1);
   localStorage.setItem("gstClients", JSON.stringify(gstClients));
   renderGST();
 }
 
+/******** INIT ********/
 renderGST();
 
 /* ================= INCOME TAX CLIENTS ================= */

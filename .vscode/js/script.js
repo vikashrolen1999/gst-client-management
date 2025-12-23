@@ -30,8 +30,24 @@ function showSection(type) {
 }
 
 /******** GST CLIENTS ********/
-let gstClients = JSON.parse(localStorage.getItem("gstClients")) || [];
+let gstClients = [];
 let editIndex = null;
+function restrictPastMonths() {
+  // abhi blank chhod de
+}
+async function loadGSTFromFirebase() {
+  gstClients = [];
+
+  const snapshot = await db.collection("gstClients").get();
+  snapshot.forEach((doc) => {
+    gstClients.push(doc.data());
+  });
+
+  renderGST();
+}
+
+// page load
+loadGSTFromFirebase();
 
 function openGSTModal(index = null) {
   gstModal.style.display = "flex";
@@ -86,8 +102,14 @@ saveGSTBtn.onclick = () => {
   if (editIndex !== null) gstClients[editIndex] = client;
   else gstClients.push(client);
 
-  localStorage.setItem("gstClients", JSON.stringify(gstClients));
-  renderGST();
+  if (editIndex !== null) {
+    db.collection("gstClients").doc(gstClients[editIndex].id).set(client);
+  } else {
+    db.collection("gstClients").add(client);
+  }
+  fetchGST();
+  closeGSTModal();
+
   closeGSTModal();
 };
 
@@ -142,9 +164,17 @@ function renderGST() {
 
 function deleteGST(index) {
   if (!confirm("Delete this GST client?")) return;
-  gstClients.splice(index, 1);
-  localStorage.setItem("gstClients", JSON.stringify(gstClients));
-  renderGST();
+  db.collection("gstClients").doc(gstClients[index].id).delete();
+}
+
+function fetchGST() {
+  db.collection("gstClients").onSnapshot((snapshot) => {
+    gstClients = [];
+    snapshot.forEach((doc) => {
+      gstClients.push({ id: doc.id, ...doc.data() });
+    });
+    renderGST();
+  });
 }
 
 renderGST();

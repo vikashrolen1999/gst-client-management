@@ -32,14 +32,34 @@ function showSection(type) {
   localSection.style.display = type === "local" ? "block" : "none";
 }
 
+/******** SECTION SWITCH ********/
+function showSection(type) {
+  gstSection.style.display = type === "gst" ? "block" : "none";
+  itSection.style.display = type === "it" ? "block" : "none";
+  localSection.style.display = type === "local" ? "block" : "none";
+}
+
 /******** GST CLIENTS ********/
 let gstClients = [];
 let editIndex = null;
-function restrictPastMonths() {
-  // abhi blank chhod de
-}
+
 fetchGST();
 
+/******** MONTH RESTRICTION ********/
+function restrictPastMonths() {
+  const today = new Date();
+  const currentMonth = `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}`;
+
+  [...gstMonth.options].forEach((opt) => {
+    if (opt.value && opt.value < currentMonth) {
+      opt.disabled = true;
+    }
+  });
+}
+
+/******** OPEN MODAL ********/
 function openGSTModal(index = null) {
   gstModal.style.display = "flex";
   editIndex = index;
@@ -54,11 +74,16 @@ function openGSTModal(index = null) {
     gstPortalId.value = c.portalId;
     gstPortalPass.type = "text";
     gstPortalPass.value = c.portalPass;
+
+    gstOtherId.value = c.otherId || "";
+    gstOtherPass.value = c.otherPass || "";
+
     gstMonth.value = c.month;
     gstFees.value = c.fees;
   }
 }
 
+/******** CLOSE MODAL ********/
 function closeGSTModal() {
   gstModal.style.display = "none";
   editIndex = null;
@@ -67,7 +92,8 @@ function closeGSTModal() {
     .forEach((el) => (el.value = ""));
 }
 
-saveGSTBtn.onclick = () => {
+/******** SAVE GST ********/
+saveGSTBtn.onclick = async () => {
   const client = {
     name: gstName.value.trim(),
     contact: gstContact.value.trim(),
@@ -75,14 +101,14 @@ saveGSTBtn.onclick = () => {
     gstin: gstIn.value.trim(),
     portalId: gstPortalId.value.trim(),
     portalPass: gstPortalPass.value.trim(),
-
-    otherId: gstOtherId ? gstOtherId.value.trim() : "",
-    otherPass: gstOtherPass ? gstOtherPass.value.trim() : "",
-
+    otherId: gstOtherId.value.trim(),
+    otherPass: gstOtherPass.value.trim(),
     month: gstMonth.value,
     gstr1: "Pending",
     gstr3b: "Pending",
     fees: gstFees.value.trim(),
+    nextGenerated: false,
+    orderIndex: Date.now(), // 🔥 IMPORTANT
   };
 
   if (!client.name || !client.gstin || !client.month) {
@@ -90,25 +116,23 @@ saveGSTBtn.onclick = () => {
     return;
   }
 
-  if (client.name.length > 20) {
-    alert("Client Name cannot exceed 20 characters");
-    return;
-  }
-
-  // 🔥 EDIT MODE
   if (editIndex !== null) {
-    const id = gstClients[editIndex].id; // 🔑 doc id preserve
-    gstClients[editIndex] = { id, ...client };
-    db.collection("gstClients").doc(id).set(client);
-  }
-  // 🔥 ADD MODE
-  else {
-    db.collection("gstClients").add(client);
+    const id = gstClients[editIndex].id;
+    await db
+      .collection("gstClients")
+      .doc(id)
+      .set({
+        ...client,
+        orderIndex: gstClients[editIndex].orderIndex, // preserve order
+      });
+  } else {
+    await db.collection("gstClients").add(client);
   }
 
   closeGSTModal();
 };
 
+/******** RENDER TABLE ********/
 function renderGST() {
   gstTable.innerHTML = "";
 
@@ -124,7 +148,7 @@ function renderGST() {
         <td>${c.portalPass}</td>
         <td>${c.otherId || ""}</td>
         <td>${c.otherPass || ""}</td>
-        <td>${c.month}</td>
+        <td>${formatMonth(c.month)}</td>
 
         <td>
           <select data-type="gstr1" onchange="updateStatus(event, ${i})">
@@ -135,10 +159,9 @@ function renderGST() {
               c.gstr1 === "Filed" ? "selected" : ""
             }>Filed</option>
           </select>
-
           ${
             c.gstr1 === "Filed"
-              ? `&nbsp;<span onclick="sendWhatsApp('${c.contact}', 'gstr1')">💬</span>`
+              ? `<span onclick="sendWhatsApp('${c.contact}','gstr1')"> 💬</span>`
               : ""
           }
         </td>
@@ -152,16 +175,15 @@ function renderGST() {
               c.gstr3b === "Filed" ? "selected" : ""
             }>Filed</option>
           </select>
-
           ${
             c.gstr3b === "Filed"
-              ? `&nbsp;<span onclick="sendWhatsApp('${c.contact}', 'gstr3b')">💬</span>`
+              ? `<span onclick="sendWhatsApp('${c.contact}','gstr3b')"> 💬</span>`
               : ""
           }
         </td>
 
         <td>₹${c.fees}</td>
-        <td style="display: flex; padding-top: 2rem;">
+        <td>
           <span onclick="openGSTModal(${i})">✏️</span>
           &nbsp;
           <span onclick="deleteGST(${i})">🗑️</span>
@@ -171,26 +193,24 @@ function renderGST() {
   });
 }
 
+/******** DELETE ********/
 async function deleteGST(index) {
   if (!confirm("Delete this GST client?")) return;
-
-  const id = gstClients[index]?.id;
-  if (!id) {
-    alert("Document ID not found");
-    return;
-  }
-
+  const id = gstClients[index].id;
   await db.collection("gstClients").doc(id).delete();
 }
 
+/******** FETCH ********/
 function fetchGST() {
-  db.collection("gstClients").onSnapshot((snapshot) => {
-    gstClients = [];
-    snapshot.forEach((doc) => {
-      gstClients.push({ id: doc.id, ...doc.data() });
+  db.collection("gstClients")
+    .orderBy("orderIndex")
+    .onSnapshot((snapshot) => {
+      gstClients = [];
+      snapshot.forEach((doc) => {
+        gstClients.push({ id: doc.id, ...doc.data() });
+      });
+      renderGST();
     });
-    renderGST();
-  });
 }
 
 renderGST();
@@ -381,20 +401,35 @@ function login() {
   }
 }
 
+/******** UPDATE STATUS ********/
 async function updateStatus(event, index) {
-  const type = event.target.dataset.type; // gstr1 or gstr3b
-  const newStatus = event.target.value;
+  const type = event.target.dataset.type; // gstr1 / gstr3b
+  const value = event.target.value;
+
+  if (!gstClients[index]) {
+    console.error("Invalid index:", index);
+    return;
+  }
 
   const client = gstClients[index];
 
-  // current row update
-  client[type] = newStatus;
+  // update local
+  client[type] = value;
 
-  // firebase me update
-  await db.collection("gstClients").doc(client.id).set(client);
+  // update firebase
+  await db
+    .collection("gstClients")
+    .doc(client.id)
+    .update({
+      [type]: value,
+    });
 
-  // 🔥 DONO Filed hone par hi new row add hogi
-  if (client.gstr1 === "Filed" && client.gstr3b === "Filed") {
+  // 🔥 NEXT MONTH LOGIC (duplicate safe)
+  if (
+    client.gstr1 === "Filed" &&
+    client.gstr3b === "Filed" &&
+    client.nextGenerated !== true
+  ) {
     const newClient = {
       name: client.name,
       contact: client.contact,
@@ -402,60 +437,108 @@ async function updateStatus(event, index) {
       gstin: client.gstin,
       portalId: client.portalId,
       portalPass: client.portalPass,
+      otherId: client.otherId,
+      otherPass: client.otherPass,
       fees: client.fees,
       month: getNextMonth(client.month),
-
-      // ✅ default Pending
       gstr1: "Pending",
       gstr3b: "Pending",
+      nextGenerated: false,
+      orderIndex: (client.orderIndex || 0) + 1,
     };
 
     await db.collection("gstClients").add(newClient);
+
+    await db.collection("gstClients").doc(client.id).update({
+      nextGenerated: true,
+    });
   }
+
+  renderGST(); // refresh UI
 }
 
+function formatMonth(month) {
+  if (!month) return "";
+
+  // YYYY-MM → sirf month name
+  if (month.includes("-")) {
+    const [, m] = month.split("-");
+    return getMonthName(m);
+  }
+
+  // old data like "December"
+  return month;
+}
+
+function getMonthName(m) {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  return months[Number(m) - 1] || "";
+}
+
+/******** NEXT MONTH ********/
 function getNextMonth(monthStr) {
-  // example: 2024-06
   if (!monthStr) return "";
 
-  const [year, month] = monthStr.split("-").map(Number);
-  const date = new Date(year, month - 1);
-  date.setMonth(date.getMonth() + 1);
+  // agar old month name ho
+  if (!monthStr.includes("-")) {
+    const map = {
+      January: 1,
+      February: 2,
+      March: 3,
+      April: 4,
+      May: 5,
+      June: 6,
+      July: 7,
+      August: 8,
+      September: 9,
+      October: 10,
+      November: 11,
+      December: 12,
+    };
 
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
+    const m = map[monthStr];
+    if (!m) return "";
 
-  return `${y}-${m}`;
+    const y = new Date().getFullYear();
+    const d = new Date(y, m - 1);
+    d.setMonth(d.getMonth() + 1);
+
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  }
+
+  // normal YYYY-MM
+  const [y, m] = monthStr.split("-").map(Number);
+  const d = new Date(y, m - 1);
+  d.setMonth(d.getMonth() + 1);
+
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
+/******** WHATSAPP ********/
 function sendWhatsApp(mobile, type) {
-  if (!mobile) {
-    alert("Mobile number not found");
-    return;
-  }
-
-  // India format ensure
   let phone = mobile.replace(/\D/g, "");
-  if (phone.length === 10) {
-    phone = "91" + phone;
-  }
+  if (phone.length === 10) phone = "91" + phone;
 
-  let message = "";
+  let msg =
+    type === "gstr1"
+      ? "Dear Sir,\nApki GST R1 file ho chuki hai.\nThank you.\nRolen & Associates"
+      : "Dear Sir,\nApki GST GSTR-3B file ho chuki hai.\nThank you.\nRolen & Associates";
 
-  if (type === "gstr1") {
-    message = `Dear Sir,
-Apki GST R1 file ho chuki hai.
-Thank you.
-Rolen & Associates`;
-  }
-
-  if (type === "gstr3b") {
-    message = `Dear Sir,
-Apki GST GSTR-3B file ho chuki hai.
-Thank you.
-Rolen & Associates`;
-  }
-
-  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank");
+  window.open(
+    `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,
+    "_blank"
+  );
 }

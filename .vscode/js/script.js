@@ -22,6 +22,9 @@ const gstMonth = document.getElementById("gstMonth");
 const gstFees = document.getElementById("gstFees");
 const saveGSTBtn = document.getElementById("saveGSTBtn");
 
+const gstOtherId = document.getElementById("gstOtherId");
+const gstOtherPass = document.getElementById("gstOtherPass");
+
 /******** SECTION SWITCH ********/
 function showSection(type) {
   gstSection.style.display = type === "gst" ? "block" : "none";
@@ -35,19 +38,7 @@ let editIndex = null;
 function restrictPastMonths() {
   // abhi blank chhod de
 }
-async function loadGSTFromFirebase() {
-  gstClients = [];
-
-  const snapshot = await db.collection("gstClients").get();
-  snapshot.forEach((doc) => {
-    gstClients.push(doc.data());
-  });
-
-  renderGST();
-}
-
-// page load
-loadGSTFromFirebase();
+fetchGST();
 
 function openGSTModal(index = null) {
   gstModal.style.display = "flex";
@@ -84,6 +75,10 @@ saveGSTBtn.onclick = () => {
     gstin: gstIn.value.trim(),
     portalId: gstPortalId.value.trim(),
     portalPass: gstPortalPass.value.trim(),
+
+    otherId: gstOtherId ? gstOtherId.value.trim() : "",
+    otherPass: gstOtherPass ? gstOtherPass.value.trim() : "",
+
     month: gstMonth.value,
     gstr1: "Pending",
     gstr3b: "Pending",
@@ -94,21 +89,22 @@ saveGSTBtn.onclick = () => {
     alert("Client Name, GSTIN & Month required");
     return;
   }
+
   if (client.name.length > 20) {
     alert("Client Name cannot exceed 20 characters");
     return;
   }
 
-  if (editIndex !== null) gstClients[editIndex] = client;
-  else gstClients.push(client);
-
+  // 🔥 EDIT MODE
   if (editIndex !== null) {
-    db.collection("gstClients").doc(gstClients[editIndex].id).set(client);
-  } else {
+    const id = gstClients[editIndex].id; // 🔑 doc id preserve
+    gstClients[editIndex] = { id, ...client };
+    db.collection("gstClients").doc(id).set(client);
+  }
+  // 🔥 ADD MODE
+  else {
     db.collection("gstClients").add(client);
   }
-  fetchGST();
-  closeGSTModal();
 
   closeGSTModal();
 };
@@ -129,6 +125,7 @@ function renderGST() {
         <td>${c.otherId || ""}</td>
         <td>${c.otherPass || ""}</td>
         <td>${c.month}</td>
+
         <td>
           <select data-type="gstr1" onchange="updateStatus(event, ${i})">
             <option value="Pending" ${
@@ -138,8 +135,14 @@ function renderGST() {
               c.gstr1 === "Filed" ? "selected" : ""
             }>Filed</option>
           </select>
-          &nbsp;<span onclick="sendWhatsApp('${c.contact}', 'gstr1')">💬</span>
+
+          ${
+            c.gstr1 === "Filed"
+              ? `&nbsp;<span onclick="sendWhatsApp('${c.contact}', 'gstr1')">💬</span>`
+              : ""
+          }
         </td>
+
         <td>
           <select data-type="gstr3b" onchange="updateStatus(event, ${i})">
             <option value="Pending" ${
@@ -149,8 +152,14 @@ function renderGST() {
               c.gstr3b === "Filed" ? "selected" : ""
             }>Filed</option>
           </select>
-          &nbsp;<span onclick="sendWhatsApp('${c.contact}', 'gstr3b')">💬</span>
+
+          ${
+            c.gstr3b === "Filed"
+              ? `&nbsp;<span onclick="sendWhatsApp('${c.contact}', 'gstr3b')">💬</span>`
+              : ""
+          }
         </td>
+
         <td>₹${c.fees}</td>
         <td style="display: flex; padding-top: 2rem;">
           <span onclick="openGSTModal(${i})">✏️</span>
@@ -162,9 +171,16 @@ function renderGST() {
   });
 }
 
-function deleteGST(index) {
+async function deleteGST(index) {
   if (!confirm("Delete this GST client?")) return;
-  db.collection("gstClients").doc(gstClients[index].id).delete();
+
+  const id = gstClients[index]?.id;
+  if (!id) {
+    alert("Document ID not found");
+    return;
+  }
+
+  await db.collection("gstClients").doc(id).delete();
 }
 
 function fetchGST() {
@@ -363,4 +379,83 @@ function login() {
   } else {
     messageDiv.textContent = "Invalid email or password";
   }
+}
+
+async function updateStatus(event, index) {
+  const type = event.target.dataset.type; // gstr1 or gstr3b
+  const newStatus = event.target.value;
+
+  const client = gstClients[index];
+
+  // current row update
+  client[type] = newStatus;
+
+  // firebase me update
+  await db.collection("gstClients").doc(client.id).set(client);
+
+  // 🔥 DONO Filed hone par hi new row add hogi
+  if (client.gstr1 === "Filed" && client.gstr3b === "Filed") {
+    const newClient = {
+      name: client.name,
+      contact: client.contact,
+      firms: client.firms,
+      gstin: client.gstin,
+      portalId: client.portalId,
+      portalPass: client.portalPass,
+      fees: client.fees,
+      month: getNextMonth(client.month),
+
+      // ✅ default Pending
+      gstr1: "Pending",
+      gstr3b: "Pending",
+    };
+
+    await db.collection("gstClients").add(newClient);
+  }
+}
+
+function getNextMonth(monthStr) {
+  // example: 2024-06
+  if (!monthStr) return "";
+
+  const [year, month] = monthStr.split("-").map(Number);
+  const date = new Date(year, month - 1);
+  date.setMonth(date.getMonth() + 1);
+
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+
+  return `${y}-${m}`;
+}
+
+function sendWhatsApp(mobile, type) {
+  if (!mobile) {
+    alert("Mobile number not found");
+    return;
+  }
+
+  // India format ensure
+  let phone = mobile.replace(/\D/g, "");
+  if (phone.length === 10) {
+    phone = "91" + phone;
+  }
+
+  let message = "";
+
+  if (type === "gstr1") {
+    message = `Dear Sir,
+Apki GST R1 file ho chuki hai.
+Thank you.
+Rolen & Associates`;
+  }
+
+  if (type === "gstr3b") {
+    message = `Dear Sir,
+Apki GST GSTR-3B file ho chuki hai.
+Thank you.
+Rolen & Associates`;
+  }
+
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
 }

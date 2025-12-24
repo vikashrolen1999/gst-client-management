@@ -3,6 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>GST Client Management</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -111,7 +113,9 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-      <h3 style="text-align: center;">Client Panel</h3>
+      <div>
+        <h3 >Client Panel</h3>
+      </div>
       <button onclick="showSection('gst')">GST Clients</button>
       <button onclick="showSection('it')">Income Tax Clients</button>
       <button onclick="showSection('local')">Local Clients</button>
@@ -122,30 +126,37 @@
 
       <!-- GST SECTION -->
       <div id="gstSection">
-        <h2 style="color: #1f3c88; text-align: center;">GST Clients (Rolen and associates)</h2>
-        <button class="btn-primary" onclick="openGSTModal()">+ Add Client</button>
+        <!-- <h2 style="color: #1f3c88; text-align: center;">GST Clients (Rolen and associates)</h2>
+        <button class="btn-primary" onclick="openGSTModal()">+ Add Client</button> -->
+        <div class="gst-header">
+          <h2>GST Clients (Rolen and associates)</h2>
+          <button class="btn-primary" onclick="openGSTModal()">+ Add Client</button>
+        </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>SN No.</th>
-              <th>Client Name</th>
-              <th>Client Mo. NO.</th>
-              <th>Number of Firm</th>
-              <th>GSTIN</th>
-              <th>GST ID</th>
-              <th>GST Pass</th>
-              <th>Other ID</th>
-              <th>Other Pass</th>
-              <th>Month</th>
-              <th>GSTR-1</th>
-              <th>GSTR-3B</th>
-              <th>Fees</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="gstTable"></tbody>
-        </table>
+        <div class="table-wrapper">
+
+          <table>
+            <thead>
+              <tr>
+                <th>SN No.</th>
+                <th>Client Name</th>
+                <th>Client Mo. NO.</th>
+                <th>Number of Firm</th>
+                <th>GSTIN</th>
+                <th>GST ID</th>
+                <th>GST Pass</th>
+                <th>Other ID</th>
+                <th>Other Pass</th>
+                <th>Month</th>
+                <th>GSTR-1</th>
+                <th>GSTR-3B</th>
+                <th>Fees</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="gstTable"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- IT SECTION -->

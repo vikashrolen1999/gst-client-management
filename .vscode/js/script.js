@@ -542,3 +542,10 @@ function sendWhatsApp(mobile, type) {
     "_blank"
   );
 }
+document.querySelectorAll(".sidebar button").forEach(btn => {
+  btn.addEventListener("click", function () {
+    document.querySelectorAll(".sidebar button")
+      .forEach(b => b.classList.remove("active"));
+    this.classList.add("active");
+  });
+});
